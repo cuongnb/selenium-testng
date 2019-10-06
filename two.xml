@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Test Suite Two">
+
+    <listeners>
+        <listener class-name="com.autotest.listeners.SuiteListeners"/>
+    </listeners>
+
+    <test name="Test Method1">
+        <classes>
+            <class name="com.autotest.SuiteListenersTests2"/>
+        </classes>
+    </test>
+
+</suite>
