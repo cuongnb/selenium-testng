@@ -17,7 +17,7 @@ import java.util.*;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.poi.ss.usermodel.CellType.FORMULA;
 
-public class ExcelUtil {
+public class ReadExcelUtil {
     /**
      * Đọc data tù file excel
      *
