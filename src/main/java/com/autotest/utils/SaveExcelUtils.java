@@ -4,15 +4,11 @@ import com.autotest.config.annotation.ExcelField;
 import com.autotest.data.TestResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -25,10 +21,15 @@ public class SaveExcelUtils {
 
     public static void saveResult(List<? extends TestResult> testResults, String filePath, String sheetName) {
         try {
-            Workbook workbook = getWorkbook(filePath);
             File file = new File(filePath);
-            FileOutputStream fileOut = new FileOutputStream(file);
-
+            Workbook workbook;
+            FileInputStream inputStream = null;
+            if (file.exists()) {
+                inputStream = new FileInputStream(file);
+                workbook = WorkbookFactory.create(inputStream);
+            } else {
+                workbook = new HSSFWorkbook();
+            }
             Sheet sheet = workbook.createSheet(sheetName);
 
             Map<String, ExcelField> headPositionMap = getHeadPositionMap(TestResult.class);
@@ -45,24 +46,15 @@ public class SaveExcelUtils {
                         Row row = sheet.createRow(rowCount.getAndSet(rowCount.get() + 1));
                         saveObject(row, testResult, headGetMethodMap, headPositionMap);
                     });
+            if (inputStream != null) inputStream.close();
+            FileOutputStream outputStream = new FileOutputStream(filePath);
+            workbook.write(outputStream);
+            workbook.close();
+            outputStream.close();
 
-            workbook.write(fileOut);
-            fileOut.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-    }
-
-    private static Workbook getWorkbook(String excelFilePath) throws IOException {
-        Workbook workbook;
-        if (excelFilePath.endsWith("xlsx")) {
-            workbook = new XSSFWorkbook();
-        } else if (excelFilePath.endsWith("xls")) {
-            workbook = new HSSFWorkbook();
-        } else {
-            throw new IllegalArgumentException("The specified file is not Excel file");
-        }
-        return workbook;
     }
 
     private static void saveObject(Row row, TestResult testResult,
@@ -118,5 +110,4 @@ public class SaveExcelUtils {
                         methodHeadMap.containsKey(method.getName()))
                 .collect(toMap(method -> methodHeadMap.get(method.getName()), Function.identity()));
     }
-
 }
