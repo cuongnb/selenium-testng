@@ -23,7 +23,8 @@ public class ParallelMethodTest {
         System.out.println("Simple test-method Two. Thread id is: " + id);
     }
 
-    @Test(threadPoolSize = 3, invocationCount = 6, timeOut = 1000)
+//    @Test(threadPoolSize = 3, invocationCount = 6, timeOut = 1000)
+    @Test
     public void testMethod() {
         Long id = Thread.currentThread().getId();
         System.out.println("Test method executing on thread with id: " + id);

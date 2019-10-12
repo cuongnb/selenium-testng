@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TestResult {
     private Integer order;
-    @ExcelField(name = "Test Step No.", position = 0)
+    @ExcelField(name = "STT", position = 4)
     private Integer step;
     @ExcelField(name = "Action", position = 1)
     private String action;

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true"
+          name="/home/cuongnb/code/autotest/selenium-testng/src/main/test/com/autotest/LoginTesting.java">
+        <parameter name="filePath" value="result/autotest.xls"></parameter>
+        <parameter name="sheetName" value="login3"></parameter>
+        <classes>
+            <class name="com.autotest.LoginTesting">
+                <methods>
+                    <include name="LaunchWebsite"/>
+                    <include name="FillLoginDetails"/>
+                    <include name="DoLogin"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
