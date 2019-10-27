@@ -77,7 +77,7 @@ public class ReadExcelUtil {
             is.close();
             Map<Integer, T> rowDataMap = transToObject(clz, xssfWorkbook, sheetName);
             if (clz.getSuperclass().getSimpleName().equals(ExcelRow.class.getSimpleName())) {
-                rowDataMap.forEach((key, value) -> ((ExcelRow) value).setOrder(key));
+                rowDataMap.forEach((key, value) -> ((ExcelRow) value).setRow(key));
             }
             return new ArrayList<>(rowDataMap.values());
         } catch (Exception e) {

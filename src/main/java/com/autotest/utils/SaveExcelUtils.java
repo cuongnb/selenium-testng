@@ -44,7 +44,7 @@ public class SaveExcelUtils {
                 cell.setCellValue(value.name());
             });
             objs.stream()
-                    .sorted(Comparator.comparing(ExcelRow::getOrder))
+                    .sorted(Comparator.comparing(ExcelRow::getRow))
                     .forEach(testResult -> {
                         Row row = sheet.createRow(rowCount.getAndSet(rowCount.get() + 1));
                         saveObject(row, testResult, headGetMethodMap, headPositionMap);
@@ -79,9 +79,9 @@ public class SaveExcelUtils {
             Map<String, Method> headGetMethodMap = getGetMethod(aClass, headPositionMap.keySet());
 
             objs.stream()
-                    .sorted(Comparator.comparing(ExcelRow::getOrder))
+                    .sorted(Comparator.comparing(ExcelRow::getRow))
                     .forEach(testResult -> {
-                        Row row = sheet.getRow(testResult.getOrder());
+                        Row row = sheet.getRow(testResult.getRow());
                         saveObject(row, testResult, headGetMethodMap, headPositionMap);
                     });
             FileOutputStream outputStream = new FileOutputStream(filePath);

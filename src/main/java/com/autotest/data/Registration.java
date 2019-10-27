@@ -1,7 +1,7 @@
 package com.autotest.data;
 
 import com.autotest.config.annotation.ExcelField;
-import lombok.Data;
+import lombok.Data; // thư viện lombok auto sinh ra get/set
 
 @Data
 public class Registration extends ExcelRow {
@@ -12,6 +12,8 @@ public class Registration extends ExcelRow {
     private String username;
     private String password;
     private String name;
-    @ExcelField(name = "Kết quả", position = 7)
+    @ExcelField(position = 7)
     private String actual;
+    @ExcelField(position = 8)
+    private String realMessage;
 }

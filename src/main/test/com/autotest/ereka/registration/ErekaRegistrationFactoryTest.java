@@ -13,8 +13,8 @@ public class ErekaRegistrationFactoryTest {
     public List<Registration> users;
 
     public void loadData() {
-        this.users = readExcel(Registration.class, "result/ereka.xls", "ereka_registration")
-                .subList(0, 2);
+        List<Registration> data = readExcel(Registration.class, "result/ereka.xls", "ereka_registration");
+        this.users = data.subList(0, 3);
     }
 
     @Factory

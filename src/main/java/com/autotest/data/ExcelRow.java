@@ -1,13 +1,13 @@
 package com.autotest.data;
 
 public abstract class ExcelRow {
-    private Integer order;
+    private Integer row;
 
-    public Integer getOrder() {
-        return order;
+    public Integer getRow() {
+        return row;
     }
 
-    public void setOrder(Integer order) {
-        this.order = order;
+    public void setRow(Integer row) {
+        this.row = row;
     }
 }

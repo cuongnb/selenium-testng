@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotation
 public @interface ExcelField {
-    String name();
+    String name() default "";
 
     int position();
 

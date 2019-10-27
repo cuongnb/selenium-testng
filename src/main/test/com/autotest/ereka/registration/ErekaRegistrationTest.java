@@ -52,7 +52,9 @@ public class ErekaRegistrationTest extends SeleniumDriver {
             WebElement login = driver.findElement(REGISTRATION_BUTTON);
             login.click();
             Thread.sleep(1000);
-            Assert.assertEquals(registration.getMessage().trim(), getMessageError().trim());
+            String realMessage = getMessageError().trim();
+            registration.setRealMessage(realMessage);
+            Assert.assertEquals(registration.getMessage().trim(), realMessage);
             registration.setActual("PASS");
         } catch (AssertionError e) {
             registration.setActual("FAIL");
