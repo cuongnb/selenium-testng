@@ -21,8 +21,8 @@ import static java.util.stream.Collectors.toMap;
 
 public class SaveExcelUtils {
 
-    public static void saveResultToFile(List<? extends ExcelRow> objs,
-                                        String filePath, String sheetName) {
+    public static void saveResultToFile(List<? extends ExcelRow> objs, String filePath, String sheetName) {
+        if (objs.isEmpty()) return;
         try {
             File file = new File(filePath);
             Workbook workbook;
@@ -34,9 +34,9 @@ public class SaveExcelUtils {
                 workbook = new HSSFWorkbook();
             }
             Sheet sheet = workbook.createSheet(sheetName);
-
-            Map<String, ExcelField> headPositionMap = getHeadPositionMap(TestResult.class);
-            Map<String, Method> headGetMethodMap = getGetMethod(TestResult.class, headPositionMap.keySet());
+            Class<? extends ExcelRow> aClass = objs.get(0).getClass();
+            Map<String, ExcelField> headPositionMap = getHeadPositionMap(aClass);
+            Map<String, Method> headGetMethodMap = getGetMethod(aClass, headPositionMap.keySet());
             AtomicReference<Integer> rowCount = new AtomicReference<>(0);
             Row rowHead = sheet.createRow(rowCount.getAndSet(rowCount.get() + 1));
             headPositionMap.forEach((key, value) -> {
