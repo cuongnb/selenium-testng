@@ -1,14 +1,16 @@
 package com.autotest.utils;
 
 import com.autotest.config.annotation.ExcelField;
-import com.autotest.data.TestResult;
+import com.autotest.data.ExcelRow;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -19,7 +21,8 @@ import static java.util.stream.Collectors.toMap;
 
 public class SaveExcelUtils {
 
-    public static void saveResult(List<? extends TestResult> testResults, String filePath, String sheetName) {
+    public static void saveResultToFile(List<? extends ExcelRow> objs,
+                                        String filePath, String sheetName) {
         try {
             File file = new File(filePath);
             Workbook workbook;
@@ -40,8 +43,8 @@ public class SaveExcelUtils {
                 Cell cell = rowHead.createCell(value.position());
                 cell.setCellValue(value.name());
             });
-            testResults.stream()
-                    .sorted(Comparator.comparing(TestResult::getOrder))
+            objs.stream()
+                    .sorted(Comparator.comparing(ExcelRow::getOrder))
                     .forEach(testResult -> {
                         Row row = sheet.createRow(rowCount.getAndSet(rowCount.get() + 1));
                         saveObject(row, testResult, headGetMethodMap, headPositionMap);
@@ -57,13 +60,47 @@ public class SaveExcelUtils {
         }
     }
 
-    private static void saveObject(Row row, TestResult testResult,
+    public static void saveResult(List<? extends ExcelRow> objs, String filePath, String sheetName) {
+        if (objs.isEmpty()) return;
+        InputStream is;
+        Workbook workbook;
+        try {
+            is = new FileInputStream(filePath);
+            if (filePath.endsWith(".xls")) {
+                workbook = new HSSFWorkbook(is);
+            } else {
+                workbook = new XSSFWorkbook(is);
+            }
+            is.close();
+            Sheet sheet = workbook.getSheet(sheetName);
+
+            Class<? extends ExcelRow> aClass = objs.get(0).getClass();
+            Map<String, ExcelField> headPositionMap = getHeadPositionMap(aClass);
+            Map<String, Method> headGetMethodMap = getGetMethod(aClass, headPositionMap.keySet());
+
+            objs.stream()
+                    .sorted(Comparator.comparing(ExcelRow::getOrder))
+                    .forEach(testResult -> {
+                        Row row = sheet.getRow(testResult.getOrder());
+                        saveObject(row, testResult, headGetMethodMap, headPositionMap);
+                    });
+            FileOutputStream outputStream = new FileOutputStream(filePath);
+            workbook.write(outputStream);
+            workbook.close();
+            outputStream.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private static void saveObject(Row row, Object object,
                                    Map<String, Method> headGetMethodMap,
                                    Map<String, ExcelField> headPositionMap) {
         Map<String, Object> headValueMap = headGetMethodMap.entrySet().stream()
                 .collect(toMap(Map.Entry::getKey, entry -> {
                     try {
-                        return entry.getValue().invoke(testResult);
+                        return entry.getValue().invoke(object);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                         return "";

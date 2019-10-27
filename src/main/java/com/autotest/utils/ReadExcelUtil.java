@@ -1,6 +1,7 @@
 package com.autotest.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.autotest.data.ExcelRow;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -43,7 +44,7 @@ public class ReadExcelUtil {
             int sheetNumber = xssfWorkbook.getNumberOfSheets();
             List<T> allData = new ArrayList<T>();
             for (int i = 0; i < sheetNumber; i++) {
-                allData.addAll(transToObject(clz, xssfWorkbook, xssfWorkbook.getSheetName(i)));
+                allData.addAll(transToObject(clz, xssfWorkbook, xssfWorkbook.getSheetName(i)).values());
             }
             return allData;
         } catch (Exception e) {
@@ -74,7 +75,11 @@ public class ReadExcelUtil {
                 xssfWorkbook = new XSSFWorkbook(is);
             }
             is.close();
-            return transToObject(clz, xssfWorkbook, sheetName);
+            Map<Integer, T> rowDataMap = transToObject(clz, xssfWorkbook, sheetName);
+            if (clz.getSuperclass().getSimpleName().equals(ExcelRow.class.getSimpleName())) {
+                rowDataMap.forEach((key, value) -> ((ExcelRow) value).setOrder(key));
+            }
+            return new ArrayList<>(rowDataMap.values());
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("có lỗi xãy ra khi đọc sheet " + sheetName + " ：" + e.getMessage());
@@ -82,13 +87,14 @@ public class ReadExcelUtil {
 
     }
 
-    private static <T> List<T> transToObject(Class<T> clz, Workbook xssfWorkbook, String sheetName)
+    private static <T> Map<Integer, T> transToObject(Class<T> clz, Workbook xssfWorkbook, String sheetName)
             throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        List<T> list = new ArrayList<T>();
+//        List<T> list = new ArrayList<T>();
+        Map<Integer, T> rowDatta = new HashMap<>();
         Sheet xssfSheet = xssfWorkbook.getSheet(sheetName);
         Row firstRow = xssfSheet.getRow(0);
         if (null == firstRow) {
-            return list;
+            return rowDatta;
         }
         List<Object> heads = getRow(firstRow);
         heads.add("sheetName");
@@ -106,13 +112,13 @@ public class ReadExcelUtil {
                 }
                 data.add(sheetName);
                 setValue(t, data, heads, headMethod);
-                list.add(t);
+                rowDatta.put(rowNum, t);
             } catch (IllegalArgumentException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-        return list;
+        return rowDatta;
     }
 
     private static Map<String, Method> getSetMethod(Class<?> clz,
